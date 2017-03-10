@@ -8,21 +8,25 @@ import (
 )
 
 type ginHandler struct {
-	Name   string
-	Method string
-	Path   string
+	name   string
+	method string
+	path   string
 }
 
-func (h ginHandler) String() string {
-	return fmt.Sprintf(`r.%s("%s", %s)`, h.Method, h.Path, h.Name)
+func (h ginHandler) Pkg() string {
+	return "github.com/gin-gonic/gin"
 }
 
 func (h ginHandler) FuncParam() string {
 	return `r *gin.Engine`
 }
 
-func (h ginHandler) Pkg() string {
-	return "github.com/gin-gonic/gin"
+func (h ginHandler) Path() string {
+	return h.path
+}
+
+func (h ginHandler) String() string {
+	return fmt.Sprintf(`r.%s("%s", %s)`, h.method, h.path, h.name)
 }
 
 func ginHandlerBuilder(fnDecl *ast.FuncDecl) (Handler, error) {
@@ -35,8 +39,8 @@ func ginHandlerBuilder(fnDecl *ast.FuncDecl) (Handler, error) {
 	method := strings.ToUpper(fields[1])
 	path := strings.Trim(fields[2], `" '`)
 	return ginHandler{
-		Name:   name,
-		Method: method,
-		Path:   path,
+		name:   name,
+		method: method,
+		path:   path,
 	}, nil
 }

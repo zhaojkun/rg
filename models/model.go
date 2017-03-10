@@ -5,6 +5,7 @@ import "go/ast"
 type Handler interface {
 	Pkg() string
 	FuncParam() string
+	Path() string
 	String() string
 }
 
@@ -24,6 +25,18 @@ func GetBuilder(paths []string) (HandlerBuilder, bool) {
 		}
 	}
 	return nil, false
+}
+
+type HandlerSorter []Handler
+
+func (s HandlerSorter) Len() int      { return len(s) }
+func (s HandlerSorter) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+func (s HandlerSorter) Less(i, j int) bool {
+	p1, p2 := s[i].Path(), s[j].Path()
+	if len(p1) == len(p2) {
+		return s[i].Path() < s[j].Path()
+	}
+	return len(p1) < len(p2)
 }
 
 func init() {

@@ -12,6 +12,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"sort"
 	"strings"
 
 	"github.com/zhaojkun/rg/models"
@@ -30,6 +31,7 @@ func main() {
 		hs := parseFile(file)
 		handlers = append(handlers, hs...)
 	}
+	sort.Sort(models.HandlerSorter(handlers))
 	source := generate(*fnName, handlers)
 	formatedSource, err := format.Source(source)
 	if err != nil {

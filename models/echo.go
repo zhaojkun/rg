@@ -8,21 +8,25 @@ import (
 )
 
 type echoHandler struct {
-	Name   string
-	Method string
-	Path   string
+	name   string
+	method string
+	path   string
 }
 
-func (h echoHandler) String() string {
-	return fmt.Sprintf(`e.%s("%s", %s)`, h.Method, h.Path, h.Name)
+func (h echoHandler) Pkg() string {
+	return "github.com/labstack/echo"
 }
 
 func (h echoHandler) FuncParam() string {
 	return `e *echo.Echo`
 }
 
-func (h echoHandler) Pkg() string {
-	return "github.com/labstack/echo"
+func (h echoHandler) Path() string {
+	return h.path
+}
+
+func (h echoHandler) String() string {
+	return fmt.Sprintf(`e.%s("%s", %s)`, h.method, h.path, h.name)
 }
 
 func echoHandlerBuilder(fnDecl *ast.FuncDecl) (Handler, error) {
@@ -35,8 +39,8 @@ func echoHandlerBuilder(fnDecl *ast.FuncDecl) (Handler, error) {
 	method := strings.ToUpper(fields[1])
 	path := strings.Trim(fields[2], `" '`)
 	return echoHandler{
-		Name:   name,
-		Method: method,
-		Path:   path,
+		name:   name,
+		method: method,
+		path:   path,
 	}, nil
 }
