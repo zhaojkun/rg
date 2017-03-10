@@ -21,6 +21,10 @@ func (h echoHandler) FuncParam() string {
 	return `e *echo.Echo`
 }
 
+func (h echoHandler) Pkg() string {
+	return "github.com/labstack/echo"
+}
+
 func echoHandlerBuilder(fnDecl *ast.FuncDecl) (Handler, error) {
 	doc := fnDecl.Doc.Text()
 	fields := strings.Fields(doc)

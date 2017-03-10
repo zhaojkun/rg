@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"go/ast"
+	"go/format"
 	"go/parser"
 	"go/token"
 	"io/ioutil"
@@ -15,6 +17,11 @@ import (
 	"github.com/zhaojkun/rg/models"
 )
 
+var (
+	pkg    = flag.String("pkg", "main", "package name")
+	fnName = flag.String("name", "registerRoutes", "function name")
+)
+
 func main() {
 	flag.Parse()
 	gofiles := listFiles(flag.Args())
@@ -23,13 +30,26 @@ func main() {
 		hs := parseFile(file)
 		handlers = append(handlers, hs...)
 	}
-	if len(handlers) > 0 {
-		fmt.Printf("func registerRoutes(%s){\n", handlers[0].FuncParam())
-		for _, handler := range handlers {
-			fmt.Println(" ", handler)
-		}
-		fmt.Println(`}`)
+	source := generate(*fnName, handlers)
+	formatedSource, err := format.Source(source)
+	if err != nil {
+		log.Fatal(err)
 	}
+	fmt.Printf(string(formatedSource))
+}
+
+func generate(fnName string, handlers []models.Handler) []byte {
+	var buf bytes.Buffer
+	buf.WriteString(fmt.Sprintf("package %s\n", *pkg))
+	if len(handlers) > 0 {
+		buf.WriteString(fmt.Sprintf("import \"%s\"\n", handlers[0].Pkg()))
+		buf.WriteString(fmt.Sprintf("func %s(%s){\n", fnName, handlers[0].FuncParam()))
+		for _, handler := range handlers {
+			buf.WriteString(fmt.Sprintf(" %s\n", handler))
+		}
+		buf.WriteString("}")
+	}
+	return buf.Bytes()
 }
 
 func listFiles(args []string) []string {

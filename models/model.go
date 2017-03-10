@@ -3,6 +3,7 @@ package models
 import "go/ast"
 
 type Handler interface {
+	Pkg() string
 	FuncParam() string
 	String() string
 }
