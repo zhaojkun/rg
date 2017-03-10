@@ -29,4 +29,5 @@ func GetBuilder(paths []string) (HandlerBuilder, bool) {
 func init() {
 	frameworkHandler = make(map[string]HandlerBuilder)
 	Register("github.com/labstack/echo", echoHandlerBuilder)
+	Register("github.com/gin-gonic/gin", ginHandlerBuilder)
 }
