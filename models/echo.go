@@ -1,7 +1,6 @@
 package models
 
 import (
-	"errors"
 	"fmt"
 	"go/ast"
 	"strings"
@@ -32,15 +31,15 @@ func (h echoHandler) String() string {
 func echoHandlerBuilder(fnDecl *ast.FuncDecl) (Handler, error) {
 	doc := fnDecl.Doc.Text()
 	fields := strings.Fields(doc)
-	if len(fields) != 3 {
-		return nil, errors.New("comment not ok")
+	p, err := parseURL(fields)
+	if err != nil {
+		return nil, err
 	}
-	name := fields[0]
-	method := strings.ToUpper(fields[1])
-	path := strings.Trim(fields[2], `" '`)
+	name := fnDecl.Name.Name
+	method := parseHTTPMethod(fields)
 	return echoHandler{
 		name:   name,
 		method: method,
-		path:   path,
+		path:   p,
 	}, nil
 }
