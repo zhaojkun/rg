@@ -12,6 +12,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -19,8 +20,9 @@ import (
 )
 
 var (
-	pkg    = flag.String("pkg", "main", "package name")
-	fnName = flag.String("name", "registerRoutes", "function name")
+	pkg          = flag.String("pkg", "main", "package name")
+	fnName       = flag.String("name", "registerRoutes", "function name")
+	fileIgnoreRe = regexp.MustCompile(`(?P<build>\+build)\s+(?P<tool>!rg)`)
 )
 
 func main() {
@@ -89,6 +91,11 @@ func parseFile(filename string) []models.Handler {
 	f, err := parser.ParseFile(fset, filename, nil, parser.ParseComments)
 	if err != nil {
 		return nil
+	}
+	for i := 0; i < len(f.Comments); i++ {
+		if fileIgnoreRe.MatchString(f.Comments[i].Text()) {
+			return nil
+		}
 	}
 	var imports []string
 	for _, s := range f.Imports {
