@@ -29,3 +29,7 @@ func parseURL(fields []string) (string, error) {
 	}
 	return "", errors.New("url not found")
 }
+
+func checkFuncInterface() bool {
+	return false
+}

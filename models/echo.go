@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"strings"
@@ -29,6 +30,18 @@ func (h echoHandler) String() string {
 }
 
 func echoHandlerBuilder(fnDecl *ast.FuncDecl) (Handler, error) {
+	typ, ok := fnDecl.Type.Params.List[0].Type.(*ast.SelectorExpr)
+	if !ok {
+		return nil, errors.New("type error")
+	}
+	pkgIdent, ok := typ.X.(*ast.Ident)
+	if !ok {
+		return nil, errors.New("")
+	}
+	isEchoContext := pkgIdent.Name == "echo" && typ.Sel != nil && typ.Sel.Name == "Context"
+	if !isEchoContext {
+		return nil, errors.New("")
+	}
 	doc := fnDecl.Doc.Text()
 	fields := strings.Fields(doc)
 	p, err := parseURL(fields)

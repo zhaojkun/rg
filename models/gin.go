@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"strings"
@@ -29,6 +30,22 @@ func (h ginHandler) String() string {
 }
 
 func ginHandlerBuilder(fnDecl *ast.FuncDecl) (Handler, error) {
+	styp, ok := fnDecl.Type.Params.List[0].Type.(*ast.StarExpr)
+	if !ok {
+		return nil, errors.New("type error")
+	}
+	typ, ok := styp.X.(*ast.SelectorExpr)
+	if !ok {
+		return nil, errors.New("type error")
+	}
+	pkgIdent, ok := typ.X.(*ast.Ident)
+	if !ok {
+		return nil, errors.New("")
+	}
+	isGinContext := pkgIdent.Name == "gin" && typ.Sel != nil && typ.Sel.Name == "Context"
+	if !isGinContext {
+		return nil, errors.New("")
+	}
 	doc := fnDecl.Doc.Text()
 	fields := strings.Fields(doc)
 	p, err := parseURL(fields)
