@@ -13,6 +13,9 @@ type ginHandler struct {
 	path   string
 }
 
+func (h ginHandler) Method() (string, string, bool) {
+	return "", "", false
+}
 func (h ginHandler) Pkg() string {
 	return "github.com/gin-gonic/gin"
 }

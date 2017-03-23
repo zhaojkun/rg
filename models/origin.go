@@ -12,6 +12,10 @@ type originHandler struct {
 	path string
 }
 
+func (h originHandler) Method() (string, string, bool) {
+	return "", "", false
+}
+
 func (h originHandler) Pkg() string {
 	return "net/http"
 }

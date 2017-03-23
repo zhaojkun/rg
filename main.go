@@ -49,7 +49,12 @@ func generate(fnName string, handlers []models.Handler) []byte {
 	if len(handlers) > 0 {
 		pkg := handlers[0].Pkg()
 		buf.WriteString(fmt.Sprintf("import \"%s\"\n", pkg))
-		buf.WriteString(fmt.Sprintf("func %s(%s){\n", fnName, handlers[0].FuncParam()))
+		name, cls, ok := handlers[0].Method()
+		if ok {
+			buf.WriteString(fmt.Sprintf("func (%s %s)%s(%s){\n", name, cls, fnName, handlers[0].FuncParam()))
+		} else {
+			buf.WriteString(fmt.Sprintf("func %s(%s){\n", fnName, handlers[0].FuncParam()))
+		}
 		for _, handler := range handlers {
 			if pkg != handler.Pkg() {
 				continue
@@ -105,16 +110,15 @@ func parseFile(filename string) []models.Handler {
 	if !ok {
 		return nil
 	}
+	//ast.Print(fset, f)
 	var handlers []models.Handler
-	for _, obj := range f.Scope.Objects {
-		if obj.Kind == ast.Fun {
-			fnDecl, ok := (obj.Decl).(*ast.FuncDecl)
-			if !ok {
-				continue
-			}
-			if h, err := builder(fnDecl); err == nil {
-				handlers = append(handlers, h)
-			}
+	for _, obj := range f.Decls {
+		fnDecl, ok := (obj).(*ast.FuncDecl)
+		if !ok {
+			continue
+		}
+		if h, err := builder(fnDecl); err == nil {
+			handlers = append(handlers, h)
 		}
 	}
 	return handlers

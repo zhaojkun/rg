@@ -7,6 +7,7 @@ type Handler interface {
 	FuncParam() string
 	Path() string
 	String() string
+	Method() (string, string, bool)
 }
 
 type HandlerBuilder func(*ast.FuncDecl) (Handler, error)

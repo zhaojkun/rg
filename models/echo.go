@@ -11,8 +11,17 @@ type echoHandler struct {
 	name   string
 	method string
 	path   string
+	fn     *ast.FuncDecl
 }
 
+func (h echoHandler) Method() (string, string, bool) {
+	if h.fn.Recv != nil {
+		name := h.fn.Recv.List[0].Names[0].Name
+		cls := h.fn.Recv.List[0].Names[0].Obj.Decl.(*ast.Field).Type.(*ast.StarExpr).X.(*ast.Ident).Name
+		return name, "*" + cls, true
+	}
+	return "", "", false
+}
 func (h echoHandler) Pkg() string {
 	return "github.com/labstack/echo"
 }
@@ -26,6 +35,10 @@ func (h echoHandler) Path() string {
 }
 
 func (h echoHandler) String() string {
+	if h.fn.Recv != nil {
+		name := h.fn.Recv.List[0].Names[0].Name
+		return fmt.Sprintf(`e.%s("%s", %s.%s)`, h.method, h.path, name, h.name)
+	}
 	return fmt.Sprintf(`e.%s("%s", %s)`, h.method, h.path, h.name)
 }
 
@@ -45,5 +58,6 @@ func echoHandlerBuilder(fnDecl *ast.FuncDecl) (Handler, error) {
 		name:   name,
 		method: method,
 		path:   p,
+		fn:     fnDecl,
 	}, nil
 }
