@@ -16,6 +16,7 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/zhaojkun/rg/models"
 )
@@ -87,12 +88,13 @@ func generatePostman(name string, handlers []models.Handler) []byte {
 		item := postmanItem{
 			Name: h.Name,
 			Request: postmanRequest{
-				URL:    h.Path,
+				URL:    "{{baseurl}}" + h.Path,
 				Method: h.Method,
 			},
 		}
 		items = append(items, item)
 	}
+	name = fmt.Sprintf("%s_%v", name, time.Now().Format("2006-01-02_15:04:05"))
 	pm := postMan{
 		Variables: make([]string, 0, 0),
 		Info: map[string]string{
