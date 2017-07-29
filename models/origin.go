@@ -12,6 +12,12 @@ type originHandler struct {
 	path string
 }
 
+func (h originHandler) ToHTTP() HTTPHandler {
+	return HTTPHandler{
+		Name: h.name,
+		Path: h.path,
+	}
+}
 func (h originHandler) Method() (string, string, bool) {
 	return "", "", false
 }
@@ -30,6 +36,13 @@ func (h originHandler) Path() string {
 
 func (h originHandler) String() string {
 	return fmt.Sprintf(`http.HandleFunc("%s", %s)`, h.path, h.name)
+}
+func (h originHandler) JS() string {
+	return ""
+}
+
+func (h originHandler) Doc() string {
+	return ""
 }
 
 func originHandlerBuilder(fnDecl *ast.FuncDecl) (Handler, error) {

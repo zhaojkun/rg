@@ -1,6 +1,22 @@
 package example
 
-import "github.com/labstack/echo"
+import (
+	"strconv"
+
+	"github.com/labstack/echo"
+)
+
+// PageInfo
+// @Parameter {Number} id
+// @Request get /api/page/:id/pageinfo
+//
+func PageInfo(ctx echo.Context) error {
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(200, id)
+}
 
 // GetTodos get "/api/todos"
 func GetTodos(ctx echo.Context) error {

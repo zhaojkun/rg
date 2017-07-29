@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	HTTPMethods = []string{"GET", "POST", "PUT", "DELETE"}
+	HTTPMethods = []string{"GET", "POST", "PUT", "DELETE", "PATCH"}
 )
 
 func parseHTTPMethod(fields []string) string {

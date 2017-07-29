@@ -13,6 +13,13 @@ type ginHandler struct {
 	path   string
 }
 
+func (h ginHandler) ToHTTP() HTTPHandler {
+	return HTTPHandler{
+		Name:   h.name,
+		Method: h.method,
+		Path:   h.path,
+	}
+}
 func (h ginHandler) Method() (string, string, bool) {
 	return "", "", false
 }
@@ -32,6 +39,12 @@ func (h ginHandler) String() string {
 	return fmt.Sprintf(`r.%s("%s", %s)`, h.method, h.path, h.name)
 }
 
+func (h ginHandler) JS() string {
+	return ""
+}
+func (h ginHandler) Doc() string {
+	return ""
+}
 func ginHandlerBuilder(fnDecl *ast.FuncDecl) (Handler, error) {
 	if !checkFuncInterface(fnDecl, "*gin.Context") {
 		return nil, errors.New("type error")

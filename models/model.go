@@ -2,12 +2,20 @@ package models
 
 import "go/ast"
 
+type HTTPHandler struct {
+	Name   string
+	Method string
+	Path   string
+}
 type Handler interface {
+	ToHTTP() HTTPHandler
 	Pkg() string
 	FuncParam() string
 	Path() string
 	String() string
 	Method() (string, string, bool)
+	JS() string
+	Doc() string
 }
 
 type HandlerBuilder func(*ast.FuncDecl) (Handler, error)
